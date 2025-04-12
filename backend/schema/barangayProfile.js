@@ -2,14 +2,15 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const physicalInfoSchema =  new Schema({
-    barangayCode: {
-        type: String,
-        required: true,
-    },
+    
     physicalID: {
         type: String,
         required: true,
         unique: true,
+    },
+    barangayCode: {
+        type: String,
+        required: true,
     },
     totalLandArea: {
         type: Number, // Changed from Double to Number

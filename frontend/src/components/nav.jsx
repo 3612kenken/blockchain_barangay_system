@@ -68,9 +68,9 @@ export default function Navs() {
             </a>
           </li>
           <li>
-            <a href="#">
+            <Link to="/manage-officials">
               <i className="fa fa-table"></i>Barangay Officials
-            </a>
+            </Link>
           </li>
 
           <li>
@@ -86,33 +86,26 @@ export default function Navs() {
 
             <ul>
               <li>
-                <a href="#">Demographic Reference</a>
+                <Link to="/physical-information">Physical Information</Link>
               </li>
               <li>
-                <Link to="/physical-characteristics">
-                  Physical Characteristics
+                <Link to="/political-information">Political Information</Link>
+              </li>
+              <li>
+                <Link to="/fiscal-information">Fiscal Information</Link>
+              </li>
+              <li>
+                <Link to="/demographic-information">
+                  Demographic Information
                 </Link>
               </li>
               <li>
-                <a href="#">Social Condition</a>
+                <Link to="/socioeconomic-information">
+                  Socio-economic Information
+                </Link>
               </li>
               <li>
-                <a href="#">Significant Events</a>
-              </li>
-              <li>
-                <a href="#">Social Condition</a>
-              </li>
-              <li>
-                <a href="#">Economic Activity</a>
-              </li>
-              <li>
-                <a href="#">Peace and Order</a>
-              </li>
-              <li>
-                <a href="#">Government Programs</a>
-              </li>
-              <li>
-                <a href="#">Disaster Reduction</a>
+                <Link to="/recognition">Awards and Recognition</Link>
               </li>
             </ul>
           </li>
@@ -157,7 +150,7 @@ export default function Navs() {
             </a>
             <ul>
               <li>
-                <a href="#">Manage User Accounts</a>
+                <Link to="/manage-users">Manage User Accounts</Link>
               </li>
               <li>
                 <a href="#">Barangay Maintenance</a>
