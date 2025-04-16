@@ -27,12 +27,37 @@ export default function PoliticalInfo() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("/api/political-info/add", formData);
+      const response = await axios.post(
+        "http://localhost:3000/api/political-info/add",
+        formData
+      );
       alert("Political Info added successfully!");
       console.log(response.data);
+      // Reset form after successful submission
+      setFormData({
+        barangayCode: "",
+        legalBasisOfCreation: "",
+        dateOfPlebiscite: "",
+        numberOfPrecincts: "",
+        luponMember: "",
+        barangayTanod: "",
+        barangayHealthWorker: "",
+        barangayNutritionScholar: "",
+        dayCareWorker: "",
+        vawDeskOfficer: "",
+        badacClusterLeaders: "",
+      });
     } catch (error) {
       console.error("Error adding political info:", error);
-      alert("Failed to add political info.");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        alert(`Failed to add political info: ${error.response.data.message}`);
+      } else {
+        alert("Failed to add political info. Please try again later.");
+      }
     }
   };
 

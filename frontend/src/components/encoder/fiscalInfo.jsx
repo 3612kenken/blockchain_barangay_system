@@ -24,7 +24,10 @@ export default function FiscalInfo() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("/api/fiscal-info/add", formData);
+      const response = await axios.post(
+        "http://localhost:3000/api/fiscal-info/add",
+        formData
+      );
       alert("Fiscal Info added successfully!");
       console.log(response.data);
     } catch (error) {

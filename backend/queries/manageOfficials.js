@@ -15,6 +15,9 @@ async function getAllOfficials() {
 async function addOfficial(officialData) {
     try {
         await connectToDatabase(); // Ensure the database connection is established
+        if (officialData.image) {
+            officialData.image = Buffer.from(officialData.image, 'base64'); // Handle image field
+        }
         const newOfficial = new Official(officialData); // Create a new official
         await newOfficial.save(); // Save the official to the database
         return newOfficial;
@@ -27,6 +30,9 @@ async function addOfficial(officialData) {
 async function updateOfficial(id, updatedData) {
     try {
         await connectToDatabase(); // Ensure the database connection is established
+        if (updatedData.image) {
+            updatedData.image = Buffer.from(updatedData.image, 'base64'); // Handle image field
+        }
         const updatedOfficial = await Official.findByIdAndUpdate(id, updatedData, { new: true }); // Update the official
         return updatedOfficial;
     } catch (error) {

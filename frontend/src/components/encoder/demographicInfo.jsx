@@ -27,7 +27,10 @@ export default function DemographicInfo() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("/api/demographic-info/add", formData);
+      const response = await axios.post(
+        "http://localhost:3000/api/demographic-info/add",
+        formData
+      );
       alert("Demographic Info added successfully!");
       console.log(response.data);
     } catch (error) {

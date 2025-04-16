@@ -76,4 +76,6 @@ const politicalInfoSchema = new Schema({
     ],
 }, { collection: 'tbl_political_info' });
 
-module.exports = mongoose.model('PoliticalInfo', politicalInfoSchema);
+const PoliticalInfo = mongoose.models.PoliticalInfo || mongoose.model('PoliticalInfo', politicalInfoSchema);
+
+module.exports = PoliticalInfo;

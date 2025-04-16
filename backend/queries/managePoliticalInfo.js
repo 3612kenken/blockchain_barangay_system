@@ -50,9 +50,22 @@ async function searchPoliticalInfo(query) {
     }
 }
 
+// Function to get all political info
+async function getAllPoliticalInfo() {
+    try {
+        await connectToDatabase();
+        const politicalInfos = await PoliticalInfo.find({});
+        return politicalInfos;
+    } catch (error) {
+        console.error('Error getting all political info:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     addPoliticalInfo,
     editPoliticalInfo,
     deletePoliticalInfo,
     searchPoliticalInfo,
+    getAllPoliticalInfo,
 };

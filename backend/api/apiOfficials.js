@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const { 
     getAllOfficials, 
     addOfficial, 
@@ -7,6 +9,17 @@ const {
     deleteOfficial, 
     searchOfficials 
 } = require('../queries/manageOfficials');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/officials'); // Directory to store uploaded images
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
+const upload = multer({ storage });
 
 // GET all officials
 router.get('/', async (req, res) => {
@@ -20,9 +33,13 @@ router.get('/', async (req, res) => {
 });
 
 // POST a new official
-router.post('/', async (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
     try {
-        const newOfficial = await addOfficial(req.body);
+        const officialData = req.body;
+        if (req.file) {
+            officialData.image = `/uploads/officials/${req.file.filename}`;
+        }
+        const newOfficial = await addOfficial(officialData);
         res.status(201).json(newOfficial);
     } catch (error) {
         console.error('Error adding official:', error);
@@ -31,9 +48,13 @@ router.post('/', async (req, res) => {
 });
 
 // PUT (update) an official by ID
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('image'), async (req, res) => {
     try {
-        const updatedOfficial = await updateOfficial(req.params.id, req.body);
+        const updatedData = req.body;
+        if (req.file) {
+            updatedData.image = `/uploads/officials/${req.file.filename}`;
+        }
+        const updatedOfficial = await updateOfficial(req.params.id, updatedData);
         if (!updatedOfficial) {
             return res.status(404).json({ error: 'Official not found' });
         }

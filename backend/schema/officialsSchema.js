@@ -39,6 +39,10 @@ const officialsSchema = new Schema({
         type: Boolean,
         default: true,
     },
+    image: {
+        type: String, // URL or file path of the uploaded image
+        required: false,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

@@ -21,7 +21,7 @@ export default function AwardsAndRecognition() {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "/api/awards-recognition/add",
+        "http://localhost:3000/api/awards-and-recognition/add",
         formData
       );
       alert("Awards and Recognition added successfully!");

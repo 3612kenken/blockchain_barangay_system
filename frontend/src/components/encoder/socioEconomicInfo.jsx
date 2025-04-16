@@ -22,7 +22,7 @@ export default function SocioEconomicInfo() {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "/api/socio-economic-info/add",
+        "http://localhost:3000/api/socio-economic-info/add",
         formData
       );
       alert("Socio-Economic Info added successfully!");

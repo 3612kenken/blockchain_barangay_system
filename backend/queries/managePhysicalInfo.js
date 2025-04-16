@@ -50,9 +50,22 @@ async function searchPhysicalInfo(query) {
     }
 }
 
+// Function to get all physical info
+async function getAllPhysicalInfo() {
+    try {
+        await connectToDatabase();
+        const physicalInfos = await PhysicalInfo.find({});
+        return physicalInfos;
+    } catch (error) {
+        console.error('Error getting all physical info:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     addPhysicalInfo,
     editPhysicalInfo,
     deletePhysicalInfo,
     searchPhysicalInfo,
+    getAllPhysicalInfo, // Added new function to exports
 };

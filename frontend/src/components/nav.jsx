@@ -33,8 +33,6 @@ export default function Navs() {
         $("nav.ts-sidebar").toggleClass("menu-open");
       });
 
-      $("#zctb").DataTable();
-
       $("#input-43").fileinput({
         showPreview: false,
         allowedFileExtensions: ["zip", "rar", "gz", "tgz"],

@@ -23,7 +23,10 @@ export default function PhysicalInfo() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("/api/physical-info/add", formData);
+      const response = await axios.post(
+        "http://localhost:3000/api/physical-info/add",
+        formData
+      );
       alert("Physical Info added successfully!");
       console.log(response.data);
     } catch (error) {
