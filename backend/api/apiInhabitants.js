@@ -14,7 +14,8 @@ router.get('/', async (req, res) => {
         const inhabitants = await getAllInhabitants();
         res.status(200).json(inhabitants);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch inhabitants' });
+        console.error('Error fetching inhabitants:', error);
+        res.status(500).json({ error: 'Failed to fetch inhabitants', details: error.message });
     }
 });
 
@@ -24,7 +25,8 @@ router.post('/', async (req, res) => {
         const newInhabitant = await createInhabitant(req.body);
         res.status(201).json(newInhabitant);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create inhabitant' });
+        console.error('Error creating inhabitant:', error);
+        res.status(500).json({ error: 'Failed to create inhabitant', details: error.message });
     }
 });
 
@@ -34,7 +36,8 @@ router.put('/:id', async (req, res) => {
         const updatedInhabitant = await updateInhabitant(req.params.id, req.body);
         res.status(200).json(updatedInhabitant);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update inhabitant' });
+        console.error('Error updating inhabitant:', error);
+        res.status(500).json({ error: 'Failed to update inhabitant', details: error.message });
     }
 });
 
@@ -44,7 +47,8 @@ router.delete('/:id', async (req, res) => {
         const result = await deleteInhabitant(req.params.id);
         res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to delete inhabitant' });
+        console.error('Error deleting inhabitant:', error);
+        res.status(500).json({ error: 'Failed to delete inhabitant', details: error.message });
     }
 });
 
@@ -54,7 +58,8 @@ router.post('/search', async (req, res) => {
         const inhabitants = await searchInhabitants(req.body);
         res.status(200).json(inhabitants);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to search inhabitants' });
+        console.error('Error searching inhabitants:', error);
+        res.status(500).json({ error: 'Failed to search inhabitants', details: error.message });
     }
 });
 

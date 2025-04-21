@@ -66,8 +66,12 @@ class Blockchain {
 
     // Validate a block using custom validators
     validateBlock(block) {
-        for (const validator of this.validators) {
-            if (!validator(block)) {
+        for (const [index, validator] of this.validators.entries()) {
+            try {
+                if (!validator(block)) {
+                    return false;
+                }
+            } catch (error) {
                 return false;
             }
         }
@@ -83,7 +87,6 @@ function addDataToBlockchain(data) {
     const newBlock = new Block(myBlockchain.chain.length, Date.now(), data);
     if (myBlockchain.validateBlock(newBlock)) {
         myBlockchain.addBlock(newBlock);
-        console.log('Block added:', newBlock);
         return newBlock;
     } else {
         throw new Error('Block validation failed');
@@ -98,11 +101,19 @@ function validateBlockchain() {
     return myBlockchain.isChainValid();
 }
 
+// Function to add a validator
+function addValidator(validator) {
+    if (typeof validator === 'function') {
+        myBlockchain.addValidator(validator);
+    } else {
+        throw new Error('Validator must be a function');
+    }
+}
+
 // Function to remove a validator by index
 function removeValidatorByIndex(index) {
     if (index >= 0 && index < myBlockchain.validators.length) {
-        myBlockchain.validators.splice(index, 1);
-        console.log(`Validator at index ${index} removed successfully.`);
+        myBlockchain.validators.splice(index, 1); // Remove validator at the specified index
         return true;
     } else {
         throw new Error('Invalid index. No validator removed.');
@@ -112,7 +123,14 @@ function removeValidatorByIndex(index) {
 // Function to remove all validators
 function removeAllValidators() {
     myBlockchain.validators.length = 0; // Clear the validators array
-    console.log('All validators removed successfully.');
+}
+
+// Function to retrieve the list of validators
+function getValidators() {
+    return myBlockchain.validators.map((validator, index) => ({
+        index,
+        code: validator.toString(),
+    }));
 }
 
 // Example custom validator: Ensure block data is not empty
@@ -122,13 +140,17 @@ myBlockchain.addValidator((block) => {
 
 // Example custom validator: Ensure block timestamp is valid
 myBlockchain.addValidator((block) => {
-    return block.timestamp <= Date.now();
+    return typeof block.timestamp === 'number' && block.timestamp <= Date.now();
 });
 
+// Export the myBlockchain instance
 module.exports = {
+    myBlockchain, // Export the blockchain instance
     addDataToBlockchain,
     getBlockchain,
     validateBlockchain,
+    addValidator,
     removeValidatorByIndex,
     removeAllValidators,
+    getValidators,
 };

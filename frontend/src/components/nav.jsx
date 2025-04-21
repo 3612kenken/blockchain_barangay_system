@@ -61,9 +61,9 @@ export default function Navs() {
             </Link>
           </li>
           <li>
-            <a href="#">
+            <Link to="/profile">
               <i className="fa fa-table"></i>Profile
-            </a>
+            </Link>
           </li>
           <li>
             <Link to="/manage-officials">
@@ -127,7 +127,7 @@ export default function Navs() {
             </a>
             <ul>
               <li>
-                <a href="#">Households</a>
+                <Link to="/inhabitants">Inhabitants</Link>
               </li>
               <li>
                 <a href="#">Indigency</a>
@@ -138,9 +138,15 @@ export default function Navs() {
             </ul>
           </li>
           <li>
-            <a href="#">
+            <Link to="/manage-validators">
               <i className="fa fa-table"></i>Validators
-            </a>
+            </Link>
+          </li>
+
+          <li>
+            <Link to="/test-validation">
+              <i className="fa fa-table"></i>Test Validation
+            </Link>
           </li>
           <li>
             <a href="#">

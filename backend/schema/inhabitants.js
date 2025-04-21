@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const inhabitantSchema = new mongoose.Schema({
+    headID: {
+        type: String,
+    },
     hPhilSysNo: {
         type: String,
     },
@@ -24,6 +27,9 @@ const inhabitantSchema = new mongoose.Schema({
     },
     members: [
         {
+            headID: {
+                type: String,
+            },
             philSysNo: {
                 type: String,
                 required: true,

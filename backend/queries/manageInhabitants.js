@@ -5,7 +5,7 @@ const Inhabitant = require('../schema/inhabitants');
 async function getAllInhabitants() {
     try {
         await connectToDatabase(); // Establish database connection
-        const inhabitants = await Inhabitant.find({});
+        const inhabitants = await Inhabitant.find({}).populate('members'); // Populate members if needed
         return inhabitants;
     } catch (error) {
         console.error('Error fetching inhabitants:', error);
@@ -19,7 +19,7 @@ async function createInhabitant(data) {
         await connectToDatabase();
         const newInhabitant = new Inhabitant(data);
         await newInhabitant.save();
-        return newInhabitant;
+        return newInhabitant.populate('members'); // Populate members after saving
     } catch (error) {
         console.error('Error creating inhabitant:', error);
         throw error;
@@ -30,7 +30,7 @@ async function createInhabitant(data) {
 async function updateInhabitant(id, data) {
     try {
         await connectToDatabase();
-        const updatedInhabitant = await Inhabitant.findByIdAndUpdate(id, data, { new: true });
+        const updatedInhabitant = await Inhabitant.findByIdAndUpdate(id, data, { new: true }).populate('members'); // Populate members after update
         return updatedInhabitant;
     } catch (error) {
         console.error('Error updating inhabitant:', error);
@@ -54,7 +54,7 @@ async function deleteInhabitant(id) {
 async function searchInhabitants(query) {
     try {
         await connectToDatabase();
-        const inhabitants = await Inhabitant.find(query);
+        const inhabitants = await Inhabitant.find(query).populate('members'); // Populate members in search results
         return inhabitants;
     } catch (error) {
         console.error('Error searching inhabitants:', error);
