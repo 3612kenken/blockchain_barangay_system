@@ -47,7 +47,6 @@ class Blockchain {
             if (currentBlock.hash !== currentBlock.calculateHash()) {
                 return false;
             }
-
             if (currentBlock.previousHash !== previousBlock.hash) {
                 return false;
             }
@@ -75,7 +74,7 @@ class Blockchain {
                 return false;
             }
         }
-        return true;
+        return true;S
     }
 }
 
