@@ -46,8 +46,8 @@ router.post('/search', async (req, res) => {
 // Route to handle user login
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body; // Expect email and password in the request body
-        const { token, user } = await loginUser(email, password);
+        const { username, password } = req.body; // Expect username and password in the request body
+        const { token, user } = await loginUser(username, password);
         res.status(200).json({ message: 'Login successful', token, user });
     } catch (error) {
         res.status(401).json({ error: 'Login failed', details: error.message });

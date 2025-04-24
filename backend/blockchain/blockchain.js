@@ -22,6 +22,7 @@ class Block {
 class Blockchain {
     constructor() {
         this.chain = [this.createGenesisBlock()];
+        this.pendingBlocks = []; // Store pending blocks
         this.validators = []; // Custom validators
     }
 
@@ -63,18 +64,35 @@ class Blockchain {
         }
     }
 
-    // Validate a block using custom validators
-    validateBlock(block) {
-        for (const [index, validator] of this.validators.entries()) {
-            try {
-                if (!validator(block)) {
-                    return false;
-                }
-            } catch (error) {
-                return false;
-            }
+    // Add a block to the pending list with approval status
+    addPendingBlock(block) {
+        const approvalStatus = this.validators.map(() => false); // Initialize approval status for all validators
+        this.pendingBlocks.push({ block, approvalStatus });
+    }
+
+    // Get all pending blocks with approval status
+    getPendingBlocks() {
+        return this.pendingBlocks.map(({ block, approvalStatus }) => ({
+            block,
+            approvalStatus,
+        }));
+    }
+
+    // Approve a pending block by a specific validator
+    approvePendingBlock(index, validatorIndex) {
+        const pendingBlock = this.pendingBlocks[index];
+        if (!pendingBlock) {
+            throw new Error('Invalid pending block index');
         }
-        return true;S
+
+        pendingBlock.approvalStatus[validatorIndex] = true; // Mark the validator as approved
+
+        // Check if all validators have approved the block
+        const allApproved = pendingBlock.approvalStatus.every((status) => status);
+        if (allApproved) {
+            this.addBlock(pendingBlock.block); // Move the block to the chain
+            this.pendingBlocks.splice(index, 1); // Remove the block from pending
+        }
     }
 }
 
@@ -84,12 +102,13 @@ const myBlockchain = new Blockchain();
 // Example functions to interact with the blockchain
 function addDataToBlockchain(data) {
     const newBlock = new Block(myBlockchain.chain.length, Date.now(), data);
-    if (myBlockchain.validateBlock(newBlock)) {
-        myBlockchain.addBlock(newBlock);
-        return newBlock;
-    } else {
-        throw new Error('Block validation failed');
-    }
+    myBlockchain.addPendingBlock(newBlock); // Add to pending immediately
+    return newBlock;
+}
+
+// Approve a pending block by a specific validator
+function approvePendingBlock(index, validatorIndex) {
+    myBlockchain.approvePendingBlock(index, validatorIndex);
 }
 
 function getBlockchain() {
@@ -132,6 +151,11 @@ function getValidators() {
     }));
 }
 
+// Function to retrieve pending blocks
+function getPendingBlocks() {
+    return myBlockchain.getPendingBlocks();
+}
+
 // Example custom validator: Ensure block data is not empty
 myBlockchain.addValidator((block) => {
     return block.data && Object.keys(block.data).length > 0;
@@ -144,7 +168,7 @@ myBlockchain.addValidator((block) => {
 
 // Export the myBlockchain instance
 module.exports = {
-    myBlockchain, // Export the blockchain instance
+    myBlockchain,
     addDataToBlockchain,
     getBlockchain,
     validateBlockchain,
@@ -152,4 +176,6 @@ module.exports = {
     removeValidatorByIndex,
     removeAllValidators,
     getValidators,
+    getPendingBlocks,
+    approvePendingBlock, // Export the function to approve pending blocks
 };

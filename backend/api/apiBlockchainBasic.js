@@ -8,6 +8,8 @@ const {
     removeAllValidators,
     addValidator,
     getValidators,
+    getPendingBlocks,
+    approvePendingBlock,
 } = require('../blockchain/blockchain');
 
 // Route to add data to the blockchain
@@ -87,6 +89,42 @@ router.get('/validators', (req, res) => {
         res.status(200).json({ validators });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch validators', details: error.message });
+    }
+});
+
+// Route to get pending blocks
+router.get('/pending', (req, res) => {
+    try {
+        const pendingBlocks = getPendingBlocks(); // Ensure this function returns the correct structure
+        res.status(200).json({ pendingBlocks });
+    } catch (error) {
+        console.error('Error fetching pending blocks:', error.message);
+        res.status(500).json({ error: 'Failed to fetch pending blocks', details: error.message });
+    }
+});
+
+// Route to approve a pending block
+router.post('/approve/:index', (req, res) => {
+    try {
+        const index = parseInt(req.params.index, 10);
+        const approvedBlock = approvePendingBlock(index); // Approve the block
+        res.status(200).json({ message: 'Block approved and added to the blockchain', block: approvedBlock });
+    } catch (error) {
+        console.error('Error approving block:', error.message);
+        res.status(500).json({ error: 'Failed to approve block', details: error.message });
+    }
+});
+
+// Route to approve a pending block by a specific validator
+router.post('/approve/:index/:validatorIndex', (req, res) => {
+    try {
+        const index = parseInt(req.params.index, 10);
+        const validatorIndex = parseInt(req.params.validatorIndex, 10);
+        approvePendingBlock(index, validatorIndex); // Approve the block for the specific validator
+        res.status(200).json({ message: `Block approved by validator ${validatorIndex}` });
+    } catch (error) {
+        console.error('Error approving block:', error.message);
+        res.status(500).json({ error: 'Failed to approve block', details: error.message });
     }
 });
 

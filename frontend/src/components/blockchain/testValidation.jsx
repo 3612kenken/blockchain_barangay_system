@@ -9,7 +9,7 @@ export default function TestValidation() {
   const [validationResult, setValidationResult] = useState(null);
   const [blockchain, setBlockchain] = useState([]);
   const [validators, setValidators] = useState([]);
-  const [approvedValidators, setApprovedValidators] = useState({}); // Track approved validators
+  const [pendingBlocks, setPendingBlocks] = useState([]); // Track pending blocks
 
   const sampleBlocks = [
     '{"name": "John Doe", "age": 30, "occupation": "Engineer"}',
@@ -20,6 +20,7 @@ export default function TestValidation() {
   useEffect(() => {
     fetchBlockchain();
     fetchValidators();
+    fetchPendingBlocks();
   }, []);
 
   const handleChange = (e) => {
@@ -42,49 +43,39 @@ export default function TestValidation() {
         "http://localhost:3000/api/blockchain/validators"
       );
       setValidators(response.data.validators);
-
-      // Initialize approvedValidators state
-      const initialApprovals = {};
-      response.data.validators.forEach((_, index) => {
-        initialApprovals[index] = false;
-      });
-      setApprovedValidators(initialApprovals);
     } catch (error) {
       console.error("Error fetching validators:", error);
       alert("Failed to fetch validators.");
     }
   };
 
-  const approveValidator = (index) => {
-    setApprovedValidators((prev) => ({
-      ...prev,
-      [index]: true, // Mark this validator as approved
-    }));
+  const fetchPendingBlocks = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/api/blockchain/pending"
+      );
+      setPendingBlocks(response.data.pendingBlocks); // Ensure the response contains `pendingBlocks`
+    } catch (error) {
+      console.error("Error fetching pending blocks:", error);
+      alert("Failed to fetch pending blocks.");
+    }
   };
 
-  const approveBlockWithValidator = async (validatorCode, index) => {
+  const approvePendingBlock = async (blockIndex, validatorIndex) => {
     try {
-      // Simulate approval for the validator
-      alert(`Validator ${index} approved!`);
-      setApprovedValidators((prev) => ({
-        ...prev,
-        [index]: true, // Mark this validator as approved
-      }));
+      await axios.post(
+        `http://localhost:3000/api/blockchain/approve/${blockIndex}/${validatorIndex}`
+      );
+      alert(`Block approved by Validator ${validatorIndex}`);
+      fetchPendingBlocks(); // Refresh pending blocks
+      fetchBlockchain(); // Refresh the blockchain
     } catch (error) {
-      console.error("Error approving validator:", error.message);
+      console.error("Error approving block:", error);
+      alert("Failed to approve block.");
     }
   };
 
   const addBlock = async () => {
-    // Ensure all validators are approved before adding the block
-    const allApproved = Object.values(approvedValidators).every(
-      (approved) => approved
-    );
-    if (!allApproved) {
-      alert("Please approve all validators before adding the block.");
-      return;
-    }
-
     try {
       const response = await axios.post(
         "http://localhost:3000/api/blockchain/add",
@@ -98,6 +89,7 @@ export default function TestValidation() {
         message: "Block added successfully!",
       });
       fetchBlockchain(); // Refresh the blockchain
+      fetchPendingBlocks(); // Refresh pending blocks
     } catch (error) {
       console.error("Error adding block:", error);
       setValidationResult({
@@ -150,7 +142,7 @@ export default function TestValidation() {
                 className="btn btn-primary me-2"
                 onClick={addBlock}
               >
-                Add Block
+                Add Block to Pending
               </button>
             </form>
 
@@ -164,7 +156,69 @@ export default function TestValidation() {
               </div>
             )}
 
-            <h3 className="mt-5">Blockchain</h3>
+            <h3 className="mt-5">Pending Blocks</h3>
+            <table className="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Index</th>
+                  <th>Data</th>
+                  <th>Timestamp</th>
+                  <th>Approval Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingBlocks.length > 0 ? (
+                  pendingBlocks.map((pending, blockIndex) => (
+                    <tr key={blockIndex}>
+                      <td>{blockIndex}</td>
+                      <td>{JSON.stringify(pending.block.data)}</td>
+                      <td>
+                        {new Date(pending.block.timestamp).toLocaleString()}
+                      </td>
+                      <td>
+                        {pending.approvalStatus.map(
+                          (status, validatorIndex) => (
+                            <div key={validatorIndex}>
+                              Validator {validatorIndex}:{" "}
+                              {status ? "Approved" : "Pending"}
+                            </div>
+                          )
+                        )}
+                      </td>
+                      <td>
+                        {pending.approvalStatus.map(
+                          (status, validatorIndex) => (
+                            <button
+                              key={validatorIndex}
+                              className={`btn ${
+                                status ? "btn-primary" : "btn-success"
+                              } btn-sm`}
+                              onClick={() =>
+                                approvePendingBlock(blockIndex, validatorIndex)
+                              }
+                              disabled={status} // Disable button if already approved
+                            >
+                              {status
+                                ? "Approved"
+                                : `Approve Validator ${validatorIndex}`}
+                            </button>
+                          )
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      No pending blocks found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+            <h3 className="mt-5">Approved Blocks</h3>
             <table className="table table-striped table-bordered">
               <thead>
                 <tr>
@@ -183,44 +237,6 @@ export default function TestValidation() {
                     <td>{JSON.stringify(block.data)}</td>
                     <td>{block.hash}</td>
                     <td>{block.previousHash}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <h3 className="mt-5">Validators</h3>
-            <table className="table table-striped table-bordered">
-              <thead>
-                <tr>
-                  <th>Index</th>
-                  <th>Validator Code</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {validators.map((validator, index) => (
-                  <tr key={index}>
-                    <td>{index}</td>
-                    <td>
-                      <pre>{validator.code}</pre>
-                    </td>
-                    <td>
-                      <button
-                        className={`btn ${
-                          approvedValidators[index]
-                            ? "btn-primary"
-                            : "btn-success"
-                        } btn-sm`}
-                        onClick={() =>
-                          approveBlockWithValidator(validator.code, index)
-                        }
-                        disabled={approvedValidators[index]} // Disable button if already approved
-                      >
-                        {approvedValidators[index]
-                          ? "Approved"
-                          : `Approve Block with Validator ${index}`}
-                      </button>
-                    </td>
                   </tr>
                 ))}
               </tbody>

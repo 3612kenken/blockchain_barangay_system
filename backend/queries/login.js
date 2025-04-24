@@ -21,39 +21,63 @@ function setSecretKey(newKey) {
     }
 }
 
-// Example usage to generate and log a secret key
-if (require.main === module) {
-    const secretKey = generateSecretKey();
-    console.log('Generated Secret Key:', secretKey);
+// Function to hash a password
+async function hashPassword(password) {
+    try {
+        const saltRounds = 10; // Number of salt rounds for bcrypt
+        return await bcrypt.hash(password, saltRounds);
+    } catch (error) {
+        console.error('Error hashing password:', error);
+        throw error;
+    }
+}
+
+// Function to verify a password
+async function verifyPassword(password, hashedPassword) {
+    try {
+        return await bcrypt.compare(password, hashedPassword);
+    } catch (error) {
+        console.error('Error verifying password:', error);
+        throw error;
+    }
 }
 
 // Function to handle user login
-async function loginUser(email, password) {
+async function loginUser(username, password) {
     try {
-        await connectToDatabase();
+        await connectToDatabase(); // Ensure database connection
+        const user = await User.findOne({ username }); // Find user by username
 
-        // Find user by email
-        const user = await User.findOne({ email });
         if (!user) {
             throw new Error('User not found');
         }
 
-        // Compare passwords
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        // Compare the provided password with the hashed password
+        const isPasswordValid = await verifyPassword(password, user.password);
         if (!isPasswordValid) {
             throw new Error('Invalid password');
         }
 
-        // Generate JWT token
+        // Generate a JWT token
         const token = jwt.sign(
-            { id: user._id, email: user.email, user_level: user.user_level },
+            { id: user._id, username: user.username },
             SECRET_KEY,
             { expiresIn: '1h' } // Token expires in 1 hour
         );
 
         return { token, user };
     } catch (error) {
-        console.error('Error logging in user:', error);
+        console.error('Error during login:', error);
+        throw error;
+    }
+}
+
+// Function to validate a JWT token
+function validateToken(token) {
+    try {
+        return jwt.verify(token, SECRET_KEY);
+    } catch (error) {
+        console.error('Error validating token:', error);
         throw error;
     }
 }
@@ -62,4 +86,7 @@ module.exports = {
     loginUser,
     generateSecretKey,
     setSecretKey,
+    hashPassword,
+    verifyPassword,
+    validateToken,
 };
